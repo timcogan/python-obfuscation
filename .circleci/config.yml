@@ -1,0 +1,33 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@3.2.4
+
+jobs:
+  run_tests:
+    docker:
+      - image: cimg/python:3.10-node
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: make init
+      - run:
+          name: Run tests
+          command: make test
+      - run:
+          name: Run quality tests
+          command: make quality
+      - run:
+          name: Install static type checker
+          command: npm ci
+      - run:
+          name: Run static type checking
+          command: make types
+      - codecov/upload:
+          file: coverage.xml
+
+workflows:
+  build_and_test:
+    jobs:
+      - run_tests
